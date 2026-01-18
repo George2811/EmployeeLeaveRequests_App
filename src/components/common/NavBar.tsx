@@ -66,7 +66,6 @@ function NavBar({role}: NavBarProps) {
 
   const handleLogout = () => () => {
     logout();
-    // setAnchorElUser(null);
     navigate("/login");
   };
 

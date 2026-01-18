@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { tableCellClasses } from '@mui/material/TableCell';
+import dayjs from 'dayjs';
 import {
   Paper,
   Table,
@@ -8,29 +9,34 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow
+  TableRow,
+  Chip
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import RowActionsMenu from "../../components/common/RowActionsMenu";
+import RowActionsMenu from "./RowActionsMenu";
 import { getLeaveRequests } from "../../api/leaveRequests.api";
+import type { LeaveRequestStatus } from "../../api/leaveRequest.types";
 
 interface LeaveRequestListProps {
   employeeId: string;
 }
 
 interface Column {
-  id: "actions" | "start_date" | "end_date" | "reason" | "status";
+  id: "actions" | "startDate" | "endDate" | "reason" | "status";
   label: string;
   minWidth?: number;
   align?: "left" | "right";
+  type?: 'date' | 'highlight' | 'text' | 'number' | 'actions';
 }
 
+type StatusColor = "default" | "success" | "error" | "warning" | "primary" | "secondary" | "info";
+
 const columns: readonly Column[] = [
-  { id: "actions", label: "Actions", minWidth: 50, align: "right" },
-  { id: "start_date", label: "Start Date", minWidth: 100 },
-  { id: "end_date", label: "End Date", minWidth: 100 },
-  { id: "reason", label: "Reason", minWidth: 300 },
-  { id: "status", label: "Status", minWidth: 120 }
+  { id: "actions", label: "Actions", minWidth: 50, type: "actions", align: "right" },
+  { id: "startDate", label: "Start Date", minWidth: 100, type: "date" },
+  { id: "endDate", label: "End Date", minWidth: 100, type: "date" },
+  { id: "reason", label: "Reason", minWidth: 300, type: "text" },
+  { id: "status", label: "Status", minWidth: 120, type: "highlight"}
 ];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -57,33 +63,22 @@ export default function LeaveRequestList({ employeeId }: LeaveRequestListProps) 
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState<any[]>([]);
 
-  // interface Data {
-  //   id: string;
-  //   start_date: string;
-  //   end_date: string;
-  //   reason: string;
-  //   status: string;
-  // }
-  // function createData(
-  //   id: string,
-  //   start_date: string,
-  //   end_date: string,
-  //   reason: string,
-  //   status: string
-  // ) :
-  //   Data {
-  //   return { id, start_date, end_date, reason, status };
-  // }
-
   useEffect(() => {
     getLeaveRequests(employeeId).then(setData);
-    // setData([
-    //   createData('1','01/01/2026','30/01/2026', 'Vacaciones', 'Approved'),
-    //   createData('2','01/01/2026','30/01/2026', 'Vacaciones', 'Approved'),
-    //   createData('3','01/01/2026','30/01/2026', 'Vacaciones', 'Approved'),
-    // ]);
   }, [employeeId]);
 
+  const statusColor = (status: LeaveRequestStatus) : StatusColor => {
+    switch (status) {
+      case "Approved":
+        return "success";
+      case "Pending":
+        return "warning";  
+      case "Rejected":
+        return "error";  
+      default:
+        return "info";
+    }
+  }
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -109,7 +104,7 @@ export default function LeaveRequestList({ employeeId }: LeaveRequestListProps) 
                 <StyledTableRow key={row.id}>
                   {columns.map((column) => (
                     <StyledTableCell key={column.id} align={column.align}>
-                    {column.id === "actions" ? (
+                    {column.type === "actions" ? (
                       <RowActionsMenu
                         rowId={row.id}
                         onView={(id) => console.log("View", id)}
@@ -117,7 +112,14 @@ export default function LeaveRequestList({ employeeId }: LeaveRequestListProps) 
                         onDelete={(id) => console.log("Delete", id)}
                       />
                     ) : (
-                      row[column.id]
+                      column.type === 'date'?
+                      (dayjs(row[column.id]).format('DD/MM/YYYY'))
+                      : (
+                        column.type === 'highlight'?
+                        (<Chip label={row[column.id]} color={statusColor(row[column.id])} />)
+                        :
+                        row[column.id]
+                      )
                     )}
                   </StyledTableCell>
                   ))}

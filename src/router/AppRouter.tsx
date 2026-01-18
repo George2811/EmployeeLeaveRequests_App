@@ -4,6 +4,7 @@ import AppLayout from "../components/layout/AppLayout";
 import AuthLayout from "../components/layout/AuthLayout";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+import { CreateLeaveRequest } from "../pages/CreateLeaveRequest";
 
 export const AppRouter = () => (
   <Routes>
@@ -22,7 +23,7 @@ export const AppRouter = () => (
     >
       <Route path="*" element={<Dashboard />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/createrequest" element={<Dashboard />} />
+      <Route path="/createrequest" element={<CreateLeaveRequest />} />
       <Route path="/managerview" element={<Dashboard />} />
       {/* futuras páginas */}
     </Route>

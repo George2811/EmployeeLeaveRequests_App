@@ -5,6 +5,7 @@ import {
   MenuItem
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useAuth } from "../../auth/useAuth";
 
 interface RowActionsMenuProps {
   rowId: string;
@@ -21,6 +22,7 @@ export default function RowActionsMenu({
 }: RowActionsMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { auth } = useAuth();
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -37,33 +39,42 @@ export default function RowActionsMenu({
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem
-          onClick={() => {
-            onView?.(rowId);
-            handleClose();
-          }}
-        >
-          Approve
-        </MenuItem>
+        {
+          auth.user?.role == 'Manager' &&
+          <>
+            <MenuItem         
+              sx={{ color: "success.main" }}   
+              onClick={() => {
+                onView?.(rowId);
+                handleClose();
+              }}
+            >
+              Approve
+            </MenuItem>
 
-        <MenuItem
-          onClick={() => {
-            onEdit?.(rowId);
-            handleClose();
-          }}
-        >
-          Reject
-        </MenuItem>
-
-        <MenuItem
-          sx={{ color: "error.main" }}
-          onClick={() => {
-            onDelete?.(rowId);
-            handleClose();
-          }}
-        >
-          Cancel
-        </MenuItem>
+            <MenuItem
+              sx={{ color: "error.main" }}
+              onClick={() => {
+                onEdit?.(rowId);
+                handleClose();
+              }}
+            >
+              Reject
+            </MenuItem>
+          </>
+        }
+        {
+          auth.user?.role == 'Employee' &&
+          <MenuItem
+            sx={{ color: "error.main" }}
+            onClick={() => {
+              onDelete?.(rowId);
+              handleClose();
+            }}
+          >
+            Cancel
+          </MenuItem>
+        }
       </Menu>
     </>
   );
