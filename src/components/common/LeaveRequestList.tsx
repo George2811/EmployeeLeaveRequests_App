@@ -14,30 +14,17 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import RowActionsMenu from "./RowActionsMenu";
-import { getLeaveRequests } from "../../api/leaveRequests.api";
-import type { LeaveRequestStatus } from "../../api/leaveRequest.types";
+import { deleteLeaveRequest, getLeaveRequests, updateStatusLeaveRquest } from "../../api/leaveRequests.api";
+import type { LeaveRequestStatusType } from "../../utils/types"; 
+import type { StatusColorType } from "../../utils/types";
+import { LEAVE_REQUEST_STATUS } from "../../utils/Constants";
+import type { Column } from "../../utils/interfaces";
+import { TimedAlert } from "./TimedAlert";
 
 interface LeaveRequestListProps {
   employeeId: string;
+  columns: Column[];
 }
-
-interface Column {
-  id: "actions" | "startDate" | "endDate" | "reason" | "status";
-  label: string;
-  minWidth?: number;
-  align?: "left" | "right";
-  type?: 'date' | 'highlight' | 'text' | 'number' | 'actions';
-}
-
-type StatusColor = "default" | "success" | "error" | "warning" | "primary" | "secondary" | "info";
-
-const columns: readonly Column[] = [
-  { id: "actions", label: "Actions", minWidth: 50, type: "actions", align: "right" },
-  { id: "startDate", label: "Start Date", minWidth: 100, type: "date" },
-  { id: "endDate", label: "End Date", minWidth: 100, type: "date" },
-  { id: "reason", label: "Reason", minWidth: 300, type: "text" },
-  { id: "status", label: "Status", minWidth: 120, type: "highlight"}
-];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -58,29 +45,75 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function LeaveRequestList({ employeeId }: LeaveRequestListProps) {
+export default function LeaveRequestList({ employeeId, columns }: LeaveRequestListProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [data, setData] = useState<any[]>([]);
+  const [apiSuccess, setApiSuccess] = useState<string | null>(null);
+  const [successAlertOpen, setSuccessAlertOpen] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [errorAlertOpen, setErrorAlertOpen] = useState(false);
+
 
   useEffect(() => {
     getLeaveRequests(employeeId).then(setData);
   }, [employeeId]);
 
-  const statusColor = (status: LeaveRequestStatus) : StatusColor => {
+  const statusColor = (status: LeaveRequestStatusType) : StatusColorType => {
     switch (status) {
-      case "Approved":
+      case LEAVE_REQUEST_STATUS.APPROVED:
         return "success";
-      case "Pending":
+      case LEAVE_REQUEST_STATUS.PENDING:
         return "warning";  
-      case "Rejected":
+      case LEAVE_REQUEST_STATUS.REJECTED:
         return "error";  
       default:
         return "info";
     }
   }
+  const handleUpdateStatus = async (
+    id: string,
+    row: any,
+    status: LeaveRequestStatusType
+  ) => {
+    setApiSuccess(null);
+    setApiError(null);
+
+    updateStatusLeaveRquest(id, {...row, status}).then(() => {
+      setData((prev) =>
+        prev.map((record) =>
+        record.id === row.id
+        ? { ...record, status }
+        : record
+        )
+      );
+      setSuccessAlertOpen(true);
+      setApiSuccess("Leave Request updated successfully.");
+    })
+    .catch(e => {
+      let msg = e?.response?.data || 'Something went wrong. Please try again.';
+      setApiError(msg);
+      setErrorAlertOpen(true);
+    });
+  };
+
+  const cancelLeaveRequest = (id: string, employeeId: string) => {
+    setApiSuccess(null);
+    setApiError(null);
+    deleteLeaveRequest(id, employeeId).then(() => {
+      setApiSuccess("Leave Request canceled successfully.");
+      setData((prev: any) => prev.filter((record: any) => record.id !== id));
+    });
+  }
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      {apiSuccess &&
+        <TimedAlert messaggeState={apiSuccess} isOpen={successAlertOpen} setIsOpen={setSuccessAlertOpen} colorType='success' />
+      }
+      {apiError && 
+        <TimedAlert messaggeState={apiError} isOpen={errorAlertOpen} setIsOpen={setErrorAlertOpen} colorType='error' />
+      }
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader>
           <TableHead>
@@ -106,10 +139,9 @@ export default function LeaveRequestList({ employeeId }: LeaveRequestListProps) 
                     <StyledTableCell key={column.id} align={column.align}>
                     {column.type === "actions" ? (
                       <RowActionsMenu
-                        rowId={row.id}
-                        onView={(id) => console.log("View", id)}
-                        onEdit={(id) => console.log("Edit", id)}
-                        onDelete={(id) => console.log("Delete", id)}
+                        row={row}
+                        onDelete={cancelLeaveRequest}
+                        onUpdateStatus={handleUpdateStatus}
                       />
                     ) : (
                       column.type === 'date'?

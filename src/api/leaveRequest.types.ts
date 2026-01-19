@@ -7,11 +7,10 @@ export interface CreateLeaveRequestPayload {
 }
 
 export interface LeaveRequest {
-    id: string,
+    id: string;
+    employeeId: string;
     startDate: string;
     endDate: string;
     reason: string;
     status: string;
 }
-
-export type LeaveRequestStatus = "Approved" | "Rejected" | "Pending";

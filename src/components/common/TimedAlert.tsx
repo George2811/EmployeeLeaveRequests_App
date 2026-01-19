@@ -1,11 +1,12 @@
 import Snackbar, { type SnackbarCloseReason } from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
+import type { AlertColorType } from '../../utils/types';
 
 interface TimedAlertProps {
     messaggeState: string | null;
     isOpen: boolean;
     setIsOpen:React.Dispatch<React.SetStateAction<boolean>>;
-    colorType: "success" | "error" | "warning"
+    colorType: AlertColorType
 }  
 
 export const TimedAlert = ({

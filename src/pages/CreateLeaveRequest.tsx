@@ -168,9 +168,7 @@ export const CreateLeaveRequest = () => {
               {isSubmitting ? 'Submitting...' : 'Create Leave Request'}
             </Button>
           </Stack>
-        </form>
-        {/* <CreateLeaveRequestForm employeeId={employeeId} /> */}
-        
+        </form>        
       </Container>
     </Box>
     

@@ -6,23 +6,29 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useAuth } from "../../auth/useAuth";
+import type { LeaveRequest } from "../../api/leaveRequest.types";
+import { LEAVE_REQUEST_STATUS } from "../../utils/Constants";
+import type { LeaveRequestStatusType } from "../../utils/types";
 
 interface RowActionsMenuProps {
-  rowId: string;
-  onView?: (id: string) => void;
-  onEdit?: (id: string) => void;
-  onDelete?: (id: string) => void;
+  row: LeaveRequest;
+  onDelete: (id: string, employeeId: any) => void;
+  onUpdateStatus: (
+    id: string,
+    row: LeaveRequest,
+    status: LeaveRequestStatusType
+  ) => void;
 }
 
 export default function RowActionsMenu({
-  rowId,
-  onView,
-  onEdit,
-  onDelete
+  row,
+  onDelete,
+  onUpdateStatus
 }: RowActionsMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const { auth } = useAuth();
+  const currentUserId  = auth.user?.id || '';
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -30,6 +36,18 @@ export default function RowActionsMenu({
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const approveLeaveRequest = () => {
+    onUpdateStatus(currentUserId, row, LEAVE_REQUEST_STATUS.APPROVED);
+  }
+
+  const rejectLeaveRequest = () => {
+    onUpdateStatus(currentUserId, row, LEAVE_REQUEST_STATUS.REJECTED);
+  }
+
+  const cancelLeaveRequest = () => {
+    onDelete(row.id, row.employeeId);
   };
 
   return (
@@ -45,7 +63,7 @@ export default function RowActionsMenu({
             <MenuItem         
               sx={{ color: "success.main" }}   
               onClick={() => {
-                onView?.(rowId);
+                approveLeaveRequest();
                 handleClose();
               }}
             >
@@ -55,7 +73,7 @@ export default function RowActionsMenu({
             <MenuItem
               sx={{ color: "error.main" }}
               onClick={() => {
-                onEdit?.(rowId);
+                rejectLeaveRequest();
                 handleClose();
               }}
             >
@@ -68,7 +86,7 @@ export default function RowActionsMenu({
           <MenuItem
             sx={{ color: "error.main" }}
             onClick={() => {
-              onDelete?.(rowId);
+              cancelLeaveRequest();
               handleClose();
             }}
           >
