@@ -37,19 +37,19 @@ Ejecutar en la consola (cmd, powershell, etc.) el siguiente comando:
 **npm run dev**
 
 ## Decisiones de Diseño
-### Enfoque Clean Architecture
+### 1. Enfoque Clean Architecture
 Se decidió utilizar este enfoque ya que evidencia una estructura dividida en capas. Ello es muy útil para velar por el desacoplamiento, ya que cada capa tiene un prósito como api, auth, components, pages, router.
 
-### Diseño Responsive con Material UI (MUI)
+### 2. Diseño Responsive con Material UI (MUI)
 Se utilizó Material UI como librería de componentes para asegurar un diseño moderno, consistente y responsive. De esta forma mejoramos la experiencia de usuario (UX).
 
-### Autenticación mediante JWT
+### 3. Autenticación mediante JWT
 Existe una pequeña capa de seguridad al implementar la autenticación mediante JWT a los usuarios. El token se envía en cada request para garantizar al backend el usuario que está realizando el request.
 
-### Pruebas Unitarias
+### 4. Pruebas Unitarias
 Se implementaron pruebas unitarias utilizando Vitest, aprovechando su integración nativa con Vite. Esto incrementa la confiabilidad de la app y previene regresiones.
 
-### Buenas prácticas
+### 5. Buenas prácticas
 - **Validaciones del formulario**: La app incluye validaciones en el frontend para evitar solicitudes inválidas y mejorar la experiencia de usuario.
 - **Manejo de errores**: En caso existan errores provenientes del backend se comunican mediante alertas al usuario.
 - **Uso de variables de entorno**: La data sensible es recomendable extraerla del código y aprovechar recursos como las varibales de entorno (.env). Además, ello permite mayor personalización en los distintos ambientes y despliegues (pre-producción, producción, etc.)
