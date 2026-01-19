@@ -14,7 +14,7 @@ const employeeColumns: Column[] = [
 
 const managerColumns: Column[] = [
     { id: "actions", label: "Actions", minWidth: 50, type: "actions", align: "right" },
-    { id: "name", label: "Employee", minWidth: 50, type: "text", align: "right" },
+    { id: "employee", label: "Employee", minWidth: 50, type: "child_text", align: "right" },
     { id: "startDate", label: "Start Date", minWidth: 100, type: "date" },
     { id: "endDate", label: "End Date", minWidth: 100, type: "date" },
     { id: "reason", label: "Reason", minWidth: 300, type: "text" },

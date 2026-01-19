@@ -56,7 +56,10 @@ export default function LeaveRequestList({ employeeId, columns }: LeaveRequestLi
 
 
   useEffect(() => {
-    getLeaveRequests(employeeId).then(setData);
+    getLeaveRequests(employeeId).then(r => {
+      setData(r);
+      console.log(r);
+    });
   }, [employeeId]);
 
   const statusColor = (status: LeaveRequestStatusType) : StatusColorType => {
@@ -150,7 +153,11 @@ export default function LeaveRequestList({ employeeId, columns }: LeaveRequestLi
                         column.type === 'highlight'?
                         (<Chip label={row[column.id]} color={statusColor(row[column.id])} />)
                         :
-                        row[column.id]
+                        ( column.type === 'child_text'?
+                          row[column.id]?.name
+                          :
+                          row[column.id]
+                        )
                       )
                     )}
                   </StyledTableCell>

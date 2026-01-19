@@ -6,16 +6,16 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useAuth } from "../../auth/useAuth";
-import type { LeaveRequest } from "../../api/leaveRequest.types";
+import type { LeaveRequestReadOnly } from "../../api/leaveRequest.types";
 import { LEAVE_REQUEST_STATUS } from "../../utils/Constants";
 import type { LeaveRequestStatusType } from "../../utils/types";
 
 interface RowActionsMenuProps {
-  row: LeaveRequest;
+  row: LeaveRequestReadOnly;
   onDelete: (id: string, employeeId: any) => void;
   onUpdateStatus: (
     id: string,
-    row: LeaveRequest,
+    row: LeaveRequestReadOnly,
     status: LeaveRequestStatusType
   ) => void;
 }
@@ -47,7 +47,7 @@ export default function RowActionsMenu({
   }
 
   const cancelLeaveRequest = () => {
-    onDelete(row.id, row.employeeId);
+    onDelete(row.id, row.employee.id);
   };
 
   return (

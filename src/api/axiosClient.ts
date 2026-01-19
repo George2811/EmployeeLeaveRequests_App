@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "../config/env";
 
 export const axiosClient = axios.create({
   baseURL: "https://localhost:44347/api",

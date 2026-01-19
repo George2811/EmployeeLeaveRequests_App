@@ -4,9 +4,9 @@ export type StatusColorType = "success" | "error" | "warning" | "primary" | "sec
 
 export type AlertColorType = "success" | "error" | "warning" | "info";
 
-export type ColumnType = "date" | "highlight" | "text" | "number" | "actions";
+export type ColumnType = "date" | "highlight" | "text" | "number" | "actions" | "child_text";
 
-export type ColumnIdType = "name" | "actions" | "startDate" | "endDate" | "reason" | "status";
+export type ColumnIdType = "employee" | "actions" | "startDate" | "endDate" | "reason" | "status";
 
 export type AlignmentType = "left" | "right";
 
